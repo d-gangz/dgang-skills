@@ -23,6 +23,8 @@ Manage persistent scheduled tasks that run Claude Code headlessly inside Claude 
 - **Delete** tasks and clean up associated session metadata
 - **Analyze logs** — reads past session transcripts from completed runs, identifies recurring errors, wasted steps, and prompt issues, then directly improves the task's SKILL.md prompt
 
+**Compatibility:** This skill works with **Claude Code scheduled tasks** only. It does **not** support Claude Cowork scheduled tasks — these are different scheduling systems with separate configurations and session management.
+
 **When to use:** Say "scheduled task" or ask to create/manage tasks that persist beyond the current session. Works with Claude Desktop's built-in scheduler.
 
 **Note:** After creating or deleting a scheduled task, restart Claude Desktop for changes to take effect. Prompt edits to an existing task's SKILL.md take effect on the next run without a restart.

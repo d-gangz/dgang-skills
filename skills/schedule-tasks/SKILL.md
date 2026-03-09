@@ -38,7 +38,9 @@ bash <skill-path>/scripts/create-scheduled-task.sh \
 
 If the prompt is long or complex, write it to a temp file first and pass `@/path/to/file` as the prompt argument — the script handles this.
 
-After creation, remind the user: **Restart Claude Desktop to activate the new task.**
+After creation, remind the user:
+1. **Restart Claude Desktop** to load the new task.
+2. **Click "Run Now" on the task in Claude Desktop**, then immediately stop the run. The task must be triggered manually at least once before the cron schedule will take effect — without this initial run, subsequent scheduled runs will not execute.
 
 **Common cron expressions (local timezone):**
 - `0 8 * * *` — daily at 8 AM
