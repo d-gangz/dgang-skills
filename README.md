@@ -25,6 +25,8 @@ Manage persistent scheduled tasks that run Claude Code headlessly inside Claude 
 
 **When to use:** Say "scheduled task" or ask to create/manage tasks that persist beyond the current session. Works with Claude Desktop's built-in scheduler.
 
+**Note:** After creating or deleting a scheduled task, restart Claude Desktop for changes to take effect. Prompt edits to an existing task's SKILL.md take effect on the next run without a restart.
+
 **When NOT to use:** For ephemeral in-session jobs like "remind me in 20 minutes" or "check this every 5 min" — those use the built-in `CronCreate`/`CronDelete` tools instead.
 
 ```bash
