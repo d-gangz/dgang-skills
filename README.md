@@ -31,6 +31,10 @@ Manage persistent scheduled tasks that run Claude Code headlessly inside Claude 
 npx skills add d-gangz/dgang-skills --skill schedule-tasks
 ```
 
+## Requirements
+
+macOS or Linux. Some skills use bash scripts and macOS-specific paths (e.g. `~/Library/Application Support/`), so they won't work on Windows.
+
 ## Contributing
 
 Want to add a skill? Create a new folder under `skills/<your-skill-name>/` with a valid `SKILL.md` and open a PR.
