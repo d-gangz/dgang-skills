@@ -4,30 +4,11 @@ A collection of open-source agent skills for Claude Code. Install with a single 
 
 ## Install
 
-**All skills (user-level, available across all projects):**
-
-```bash
-npx skills add d-gangz/dgang-skills -g
-```
-
-**All skills (project-level, current project only):**
-
 ```bash
 npx skills add d-gangz/dgang-skills
 ```
 
-**List available skills:**
-
-```bash
-npx skills add d-gangz/dgang-skills --list
-```
-
-**A specific skill:**
-
-```bash
-npx skills add d-gangz/dgang-skills --skill schedule-tasks
-npx skills add d-gangz/dgang-skills --skill schedule-tasks -g  # user-level
-```
+This launches an interactive guide where you can choose which skills to install and whether to install at user-level or project-level.
 
 ## Available Skills
 
