@@ -14,7 +14,7 @@ CONFIGS=$(find "$HOME/Library/Application Support/Claude/claude-code-sessions" \
 
 FOUND=false
 while IFS= read -r cfg; do
-  if uv run python3 -c "
+  if python3 -c "
 import json, sys
 data = json.load(open('$cfg'))
 ids = [t['id'] for t in data.get('scheduledTasks', [])]
@@ -23,7 +23,7 @@ sys.exit(0 if '$TASK_NAME' in ids else 1)
     FOUND=true
     BASE=$(dirname "$cfg")
 
-    uv run python3 -c "
+    python3 -c "
 import json
 f = '$cfg'
 data = json.load(open(f))

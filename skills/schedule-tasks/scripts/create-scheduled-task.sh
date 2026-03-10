@@ -63,7 +63,7 @@ fi
 # Pick the config whose existing tasks reference our folder (via cwd), or fall back to first
 TARGET_CONFIG=""
 while IFS= read -r cfg; do
-  if uv run python3 -c "
+  if python3 -c "
 import json, sys
 data = json.load(open('$cfg'))
 cwds = set()
@@ -80,7 +80,7 @@ done <<< "$CONFIGS"
 TARGET_CONFIG="${TARGET_CONFIG:-$(echo "$CONFIGS" | head -1)}"
 
 # Add the task entry
-uv run python3 -c "
+python3 -c "
 import json, time
 
 f = '$TARGET_CONFIG'

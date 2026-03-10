@@ -5,7 +5,7 @@ FILTER_FOLDER="${1:-}"
 
 find "$HOME/Library/Application Support/Claude/claude-code-sessions" \
   -name "scheduled-tasks.json" -type f 2>/dev/null | while read f; do
-  uv run python3 -c "
+  python3 -c "
 import json, sys, os
 
 data = json.load(open('$f'))
