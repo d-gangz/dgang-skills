@@ -64,14 +64,14 @@ Create or improve a `CLAUDE.md` file. Explores the codebase first, then writes i
 npx skills add d-gangz/dgang-skills --skill claude-md
 ```
 
-### tune-review-structure
+### review-structure
 
 Audit a non-technical repo's folder structure for agent-navigability and propose a refactor plan.
 
 **When to use:** Say "review structure", "audit folders", "audit my repo", "check organization", "is my repo agent-friendly", or "clean up structure".
 
 ```bash
-npx skills add d-gangz/dgang-skills --skill tune-review-structure
+npx skills add d-gangz/dgang-skills --skill review-structure
 ```
 
 ### schedule-tasks
