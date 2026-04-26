@@ -1,5 +1,5 @@
 ---
-name: core-create-cli
+name: create-cli
 description: >
   Build command-line interfaces for AI agents. Covers arguments, flags, subcommands,
   help text, output formats, error messages, exit codes, config/env precedence,

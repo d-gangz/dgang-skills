@@ -1,5 +1,5 @@
 ---
-name: tune-claude-md
+name: claude-md
 description: ALWAYS invoke this command when creating, editing, or improving any CLAUDE.md file
 argument-hint: [additional information to add]
 ---

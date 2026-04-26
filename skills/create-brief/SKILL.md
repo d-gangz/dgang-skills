@@ -1,5 +1,5 @@
 ---
-name: core-brief
+name: create-brief
 description: >
   Shape conversation context (or a fresh task description) into a 5-part brief —
   Context / Task / Constraints / Verification / Output format — ready to hand off

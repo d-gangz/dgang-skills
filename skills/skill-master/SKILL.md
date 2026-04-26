@@ -1,5 +1,5 @@
 ---
-name: core-skill-master
+name: skill-master
 description: >
   Create new skills, modify and improve existing skills. Use when users want to
   create a skill from scratch, edit or optimize an existing skill, turn a workflow

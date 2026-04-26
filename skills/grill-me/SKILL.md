@@ -1,5 +1,5 @@
 ---
-name: core-grill-me
+name: grill-me
 description: Interview the user relentlessly about whatever they want to work on — a plan, task, design, idea, feature, architecture decision, or anything else — until reaching shared understanding. Walk the decision tree one branch at a time, resolving dependencies between decisions. Use when the user says "grill me", wants to stress-test a plan or idea, wants to be interviewed about a design, or wants to flesh out an under-specified task.
 ---
 
