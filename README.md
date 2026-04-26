@@ -12,62 +12,56 @@ This launches an interactive guide where you can choose which skills to install 
 
 ## Available Skills
 
-Skills are namespaced by prefix:
-
-- **`core-*`** — general-purpose workflows (briefing tasks, building CLIs, interviewing, authoring skills)
-- **`tune-*`** — meta-skills that audit or improve other artifacts (CLAUDE.md files, repo structure)
-- **`schedule-tasks`** — persistent Claude Desktop scheduled tasks
-
-### core-brief
+### create-brief
 
 Shape conversation context (or a fresh task description) into a 5-part brief — Context / Task / Constraints / Verification / Output format — ready to hand off to an agent.
 
-**When to use:** You're ready to execute a task and want it structured first. Composes naturally with `core-grill-me` upstream, but works standalone too.
+**When to use:** You're ready to execute a task and want it structured first. Composes naturally with `grill-me` upstream, but works standalone too.
 
 **Triggers:** "draft a brief", "shape this into a brief", "turn this into a task spec", "write a brief for this".
 
 ```bash
-npx skills add d-gangz/dgang-skills --skill core-brief
+npx skills add d-gangz/dgang-skills --skill create-brief
 ```
 
-### core-create-cli
+### create-cli
 
 Build command-line interfaces for AI agents. Covers arguments, flags, subcommands, help text, output formats, error messages, exit codes, config/env precedence, and safe/dry-run behavior.
 
 **When to use:** Building a new CLI or refactoring an existing one for agent use. Includes references on CLI guidelines, auth for agents, context-window discipline, multi-resource CLIs, and response sanitization.
 
 ```bash
-npx skills add d-gangz/dgang-skills --skill core-create-cli
+npx skills add d-gangz/dgang-skills --skill create-cli
 ```
 
-### core-grill-me
+### grill-me
 
 Interview the user relentlessly about whatever they want to work on — a plan, task, design, idea, feature, architecture decision, or anything else — until reaching shared understanding. Walks the decision tree one branch at a time, resolving dependencies between decisions.
 
 **When to use:** Say "grill me", or when you want to stress-test a plan, be interviewed about a design, or flesh out an under-specified task.
 
 ```bash
-npx skills add d-gangz/dgang-skills --skill core-grill-me
+npx skills add d-gangz/dgang-skills --skill grill-me
 ```
 
-### core-skill-master
+### skill-master
 
 Create new skills, modify and improve existing skills. Engages with the task first to understand the workflow, then drafts the skill — rather than jumping straight to writing.
 
 **When to use:** Creating a skill from scratch, editing or optimizing an existing one, turning a workflow into a reusable skill, or improving a skill's description for better triggering.
 
 ```bash
-npx skills add d-gangz/dgang-skills --skill core-skill-master
+npx skills add d-gangz/dgang-skills --skill skill-master
 ```
 
-### tune-claude-md
+### claude-md
 
 Create or improve a `CLAUDE.md` file. Explores the codebase first, then writes instructions tuned to what actually exists.
 
 **When to use:** Always invoke when creating, editing, or improving any `CLAUDE.md` file.
 
 ```bash
-npx skills add d-gangz/dgang-skills --skill tune-claude-md
+npx skills add d-gangz/dgang-skills --skill claude-md
 ```
 
 ### tune-review-structure
