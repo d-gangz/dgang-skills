@@ -1,9 +1,9 @@
 ---
-name: tune-review-structure
+name: review-structure
 description: >
   Audit a non-technical repo's folder structure for agent-navigability and propose a refactor plan.
   TRIGGER when user says "review structure", "audit folders", "audit my repo", "check organization",
-  "is my repo agent-friendly", "clean up structure", or runs "/tune-review-structure".
+  "is my repo agent-friendly", "clean up structure", or runs "/review-structure".
 ---
 
 # Review Structure
