@@ -58,7 +58,7 @@ npx skills add d-gangz/dgang-skills --skill skill-master
 
 Create or improve a `CLAUDE.md` file. Explores the codebase first, then writes instructions tuned to what actually exists.
 
-**When to use:** Always invoke when creating, editing, or improving any `CLAUDE.md` file.
+**When to use:** Invoke manually (e.g. `/claude-md`) whenever you're creating, editing, or improving any `CLAUDE.md` file.
 
 ```bash
 npx skills add d-gangz/dgang-skills --skill claude-md
@@ -72,6 +72,26 @@ Audit a non-technical repo's folder structure for agent-navigability and propose
 
 ```bash
 npx skills add d-gangz/dgang-skills --skill review-structure
+```
+
+### debug-agent
+
+Diagnose why the current Claude Code session went wrong — or just review how it went — using the Three Gaps framework (Understanding / Specification / Execution, broken down into Context / Tooling / Reasoning). The main agent spawns a fork that inherits the conversation context to diagnose, presents findings, and applies any file fix only after explicit approval.
+
+**When to use:** Say "the agent got it wrong", "diagnose this session", "why did Claude mess this up", "what went wrong", "review this session", or run `/debug-agent`.
+
+```bash
+npx skills add d-gangz/dgang-skills --skill debug-agent
+```
+
+### help
+
+Help guide for non-technical Claude Code users. Covers MCP server setup, plugins, skills, hook creation, configuration, and Windows troubleshooting.
+
+**When to use:** Ask "how do I…", "help with…", "I'm stuck", or run `/help`; also triggers on installing MCP servers/plugins/skills, creating hooks ("make a hook that…", "automate when X happens"), configuration, or Windows issues.
+
+```bash
+npx skills add d-gangz/dgang-skills --skill help
 ```
 
 ### schedule-tasks
