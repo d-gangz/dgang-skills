@@ -4,9 +4,10 @@ description: >
   Shape conversation context (or a fresh task description) into a 5-part brief —
   Context / Task / Constraints / Verification / Output format — ready to hand off
   to an agent. Use when the user is ready to execute a task and wants it
-  structured first. Composes naturally with /grill-me upstream, but works
-  standalone too. Triggers: "/create-brief", "draft a brief", "shape this into a
+  structured first. Composes naturally with /core-grill-me upstream, but works
+  standalone too. Triggers: "draft a brief", "shape this into a
   brief", "turn this into a task spec", "write a brief for this".
+disable-model-invocation: true
 ---
 
 # Brief
@@ -15,13 +16,13 @@ Turn conversation context into an executable 5-part brief.
 
 The user has thought enough about a task — through `/grill-me`, free-form
 conversation, or just typing a request — and is ready to hand it off.
-`/create-brief` produces the structured handoff.
+`/brief` produces the structured handoff.
 
 ## Workflow
 
 1. **Read the conversation.** Pull every signal about the task from the recent
    conversation, including any `/grill-me` recap. If `$ARGUMENTS` was
-   provided (e.g., `/create-brief I want to draft a follow-up email...`), treat
+   provided (e.g., `/brief I want to draft a follow-up email...`), treat
    that as additional task input on top of the conversation.
 
 2. **Fill what you can.** Map signals to the 5 slots in the template below.
@@ -34,7 +35,7 @@ conversation, or just typing a request — and is ready to hand it off.
    - **Constraints** — often unstated must-dos / must-not-dos
    - **Output format** — sometimes the user genuinely doesn't care
 
-4. **Ask one focused question per weak slot.** Use `AskUserQuestion`. Each
+4. **Ask one focused question per weak slot.** Use `AskUserQuestion`/`request_user_input`. Each
    question must propose a recommended answer the user can accept with one
    tap. Skip the question entirely if you can derive a strong answer from
    the conversation.

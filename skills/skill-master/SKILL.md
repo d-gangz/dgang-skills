@@ -1,384 +1,163 @@
 ---
 name: skill-master
-description: >
-  Create new skills, modify and improve existing skills. Use when users want to
-  create a skill from scratch, edit or optimize an existing skill, turn a workflow
-  into a reusable skill, or improve a skill's description for better triggering.
+description: Create a new skill from the conversation that just happened, or improve an existing one — carries the reference for writing skills well.
+disable-model-invocation: true
 ---
 
-# Skill Master
+A skill exists to wrangle determinism out of a stochastic system. **Predictability** — the agent taking the same _process_ every run, not producing the same output — is the root virtue; every lever below serves it.
 
-Create and improve skills through conversation. The key insight: skills capture workflows, and the best way to understand a workflow is to experience it together.
+**Bold terms** are defined in `references/glossary.md`; look them up there for the full meaning.
 
-## Core Approach
+## Steps
 
-**Don't jump to drafting.** The most common mistake is writing a skill before fully understanding what it should do. Instead:
+You are invoked after the work happened: the user has just worked through a task with you (creating a skill), or an existing skill misbehaved (improving one). The conversation is the interview — mine it, don't re-ask.
 
-1. **Engage with the task itself** - When a user describes what they want, try solving it with them first. This reveals edge cases, preferences, and implicit requirements that wouldn't surface in an interview.
+1. **Mine the conversation** — the workflow that actually ran, the context it needed, what varied between the general case and this instance, what went wrong. For an existing skill, read it and diagnose against **Failure modes** below.
+2. **Ask only what the conversation can't answer** (invocation type is the usual case) — one question at a time, with a recommended answer.
+3. **Draft** the skill applying the reference below. Done when every piece of material has a decided rung: inline if every run needs it, behind a branch-named pointer if only some runs reach it.
+4. **Verify** — run the no-op test sentence by sentence, prune, and sweep the failure modes. Done when every sentence survives the test and the description carries one trigger per branch.
 
-2. **Notice patterns** - As you work through the task, observe what context you need, what decisions require judgment, what steps are always the same, and what varies.
+## Invocation
 
-3. **Probe one question at a time** - When engagement leaves gaps, fill them through `AskUserQuestion`. Ask one question, propose a recommended answer with a one-line reason, wait for the response before asking the next. Each answer informs the next question. Never batch.
+Two choices, trading different costs:
 
-4. **Draft when ready** - Only write the skill once you understand the workflow well enough to explain it to another Claude instance.
+- A **model-invoked** skill keeps a **description**, so the agent can fire it autonomously _and_ other skills can reach it (you can still type its name too). It contributes to **context load** — the description sits in the window every turn. Mechanics: omit `disable-model-invocation`, and write a model-facing description with rich trigger phrasing ("Use when the user wants…, mentions…").
+- A **user-invoked** skill strips the description from the agent's reach: only you, typing its name, can invoke it — and no other skill can. Zero context load, but it spends **cognitive load**: _you_ are the index that must remember it exists. Mechanics: set `disable-model-invocation: true`; the `description` becomes human-facing — a one-line summary, trigger lists stripped.
 
-5. **Delegate heavy reading** - If the user references long transcripts, multi-file codebases, or large attached docs, spawn `Explore` or `general-purpose` to read. Light material — the existing skill, a short doc, a single file — read directly.
+Pick model-invocation only when the agent must reach the skill on its own, or another skill must. If it only ever fires by hand, make it user-invoked and pay no context load.
 
-## Creating a New Skill
+When user-invoked skills multiply past what you can remember, that piled-up cognitive load is cured by a **router skill**: one user-invoked skill that names the others and when to reach for each.
 
-When a user wants to create a skill:
+## Writing the description
 
-**If they describe a task:** Offer to work through it together first. "Let's try this together - describe a specific example and I'll help you accomplish it. That'll help me understand exactly what the skill should do."
+A model-invoked **description** does two jobs — state what the skill is, and list the **branches** that should trigger it. Every word increases **context load**, so a description earns even harder pruning than the body:
 
-**If they have a workflow in mind:** Ask them to walk you through it with a real example. Watch for:
-- What information do they provide upfront vs. what do you need to ask for?
-- Where do they make judgment calls?
-- What output format do they expect?
-- What would make this fail?
+- **Front-load the skill's leading word** — the description is where it does its invocation work.
+- **One trigger per branch.** Synonyms that rename a single branch are **duplication** — "build features using TDD … asks for test-first development" is one branch written twice. Collapse them; keep only genuinely distinct branches.
+- **Cut identity that's already in the body.** Keep the description to triggers, plus any "when another skill needs…" reach clause.
 
-**If they're capturing a conversation:** Extract from the conversation history what context was needed, what steps were taken, what corrections were made, and what the final output looked like.
+**Good:** "Generate BigQuery queries for sales analytics. Use when the user asks about revenue or pipeline metrics, or names a BigQuery table to query."
 
-### Decisions to resolve
+**Bad:** "Helps with data queries." — no leading word, no branches; nothing to trigger on.
 
-Once engagement reveals enough of the workflow, walk these decisions in dependency order. Each gates the next — don't jump branches until the current one is resolved.
+## Lead with the goal
 
-1. **Triggers** — what phrases, file types, or contexts activate this skill? Gates everything downstream because trigger phrasing defines scope.
-2. **Scope** — what range of tasks does this procedure cover, and what falls outside? Bounds what the skill is responsible for encoding vs. what stays general.
-3. **Output** — what does success look like? Format, shape, examples.
-4. **Degrees of freedom** — text instructions, parameterized templates, or exact scripts. Match to task fragility.
-5. **Structure** — single SKILL.md, references, or scripts. Falls out of the previous answers.
+Open the skill's body with its **goal** and the _why_ behind it — the outcome it exists to produce, and why that outcome matters. An agent aiming at a known target executes with intent: it adapts when a step doesn't fit the situation instead of following a bare rule off a cliff. The same logic runs step by step — knowing _why_ a step exists is what lets the agent bend it when the edge case arrives.
 
-Walk one at a time via `AskUserQuestion`, recommendation-first.
+## Information hierarchy
 
-### Probing tactics
+A skill is built from two content types — **steps** and **reference** — that mix freely: a skill can be all steps, all reference, or both. The core decision is which to use and where each sits on the **information hierarchy**, a ladder ranked by how immediately the agent needs the material:
 
-Layer these onto the decision walk so each answer is actually load-bearing. Deploy as the situation calls, not as a checklist.
+1. **In-skill step** — an ordered action in `SKILL.md`, the primary tier: what the agent does, in order. Each step ends on a **completion criterion**, the condition that tells the agent the work is done. Make it _checkable_ (can the agent tell done from not-done?) and, where it matters, _exhaustive_ ("every modified model accounted for", not "produce a change list") — a vague criterion invites **premature completion**.
+2. **In-skill reference** — a definition, rule, or fact in `SKILL.md`, consulted on demand. Often a legitimately flat peer-set (every rule of a review on one rung) — a fine arrangement, not a smell.
+3. **External reference** — reference pushed out of `SKILL.md` into a separate file, reached by a **context pointer**, loaded only when the pointer fires. (Spans _disclosed_ reference — a sibling file like `references/glossary.md`, still part of the skill — through fully **external reference** that lives outside the skill system and any skill can point at.)
 
-- **Press for definitions** - When the user says "smarter triggering", "more robust handling", "better description", or other fuzzy terms, force a concrete version — specific phrases, observable behavior. Propose a sharp definition they can accept with one tap.
-- **Surface assumptions** - Check the framing before walking the tree. Is this one skill or three? Is the workflow actually reusable, or one-off? Is the user reaching for a skill when a CLAUDE.md note would fit better?
-- **Test consequences** - After each answer, trace the implication. "If the trigger is X, this also fires on Y — OK?" / "If freedom is high, output will vary across runs — OK?"
-- **Probe with counterexamples** - Stress-test a tentative decision before locking it in. "Would this correctly *not* fire when user says Z?" If it breaks, revisit before moving down the branch.
+A demanding completion criterion drives thorough **legwork** — the digging the agent does within the work — whether the skill has steps or not, since "every rule applied" binds flat reference just as "every step done" binds a sequence.
 
-## Improving an Existing Skill
+Push too little down and the top bloats; push too much and you hide material the agent actually needs. That tension is the whole decision.
 
-When a user wants to improve a skill:
+**Progressive disclosure** is the move down the ladder — out of `SKILL.md` into a linked file — so the top stays legible. Mechanics: a linked `.md` file in the skill folder, named for what it holds (this skill discloses its full definitions to `references/glossary.md`). Some skills are used in more than one way, and each distinct way is a **branch** — different runs taking different paths through the skill. Branching is the cleanest disclosure test: inline what every branch needs, and push behind a pointer what only some branches reach. A **context pointer**'s _wording_, not its target, decides when and how reliably the agent reaches the material.
 
-1. **Read the current skill** - Understand what it claims to do and how it's structured.
+Where the ladder decides _how far down_ a piece sits, **co-location** decides _what sits beside it_ once there: keep a concept's definition, rules, and caveats under one heading rather than scattered, so reading one part brings its neighbours with it.
 
-2. **Identify gaps** - Either from user feedback ("it doesn't handle X well") or by analyzing against best practices:
-   - Is the description specific enough for triggering?
-   - Is the content concise or bloated?
-   - Are instructions clear or ambiguous?
-   - Does it handle common edge cases?
+## When disclosure pays
 
-3. **Probe the gaps** - Same one-at-a-time, recommendation-first pattern as Core Approach #3, scoped to the gaps you identified rather than re-interviewing broadly.
+**Progressive disclosure** (above) says what's eligible to move — material only some branches reach. Eligible isn't sufficient: this decides whether the move pays.
 
-4. **Optionally, test the workflow** - Have the user describe a task the skill should handle. Try it and see where it falls short.
+Splitting doesn't remove a **branch** — it leaves a **context pointer** inline that every run still reads. The load you shed is _body minus pointer_: split only when the body is meaningfully bigger. A full ruleset sheds almost all its weight; a one-line fork sheds nothing. In the fuzzy middle, split when the branch is a distinct situation a run fully enters or fully skips; keep it inline when it's a small variation woven through a shared flow.
 
-## Writing the Skill
-
-### Structure
-
-```
-skill-name/
-├── SKILL.md           # Main instructions (required, <500 lines)
-├── references/        # Detailed docs loaded on-demand
-└── scripts/           # Utility scripts (if needed)
-```
-
-**File naming tips:**
-- Use forward slashes for paths (`reference/guide.md`, not `reference\guide.md`)
-- Name files descriptively: `form_validation_rules.md`, not `doc2.md`
-- Organize by domain: `reference/finance.md`, `reference/sales.md` (not `docs/file1.md`)
-
-### Progressive Disclosure Patterns
+Three patterns put disclosure into practice:
 
 **Pattern 1: High-level guide with references**
 ````markdown
 # PDF Processing
 
-## Quick start
-[Minimal example here]
+## Goal
+[What this skill produces and why it matters]
 
 ## Advanced features
-**Form filling**: See [FORMS.md](FORMS.md) for complete guide
-**API reference**: See [REFERENCE.md](REFERENCE.md) for all methods
+- If the task involves filling forms, read `references/forms.md`.
+- If you need the full API, read `references/api.md`.
 ````
 
 **Pattern 2: Domain-specific organization**
 ```
 bigquery-skill/
 ├── SKILL.md (overview and navigation)
-└── reference/
+└── references/
     ├── finance.md (revenue, billing)
     ├── sales.md (pipeline, accounts)
     └── product.md (usage, features)
 ```
-Claude reads only the relevant domain file.
+The agent reads only the relevant domain file.
 
 **Pattern 3: Conditional details**
 ```markdown
 ## Creating documents
-Use docx-js for new documents. See [DOCX-JS.md](DOCX-JS.md).
+If creating a new document, use docx-js — read `references/docx-js.md`.
 
 ## Editing documents
 For simple edits, modify XML directly.
-**For tracked changes**: See [REDLINING.md](REDLINING.md)
+If the edit needs tracked changes, read `references/redlining.md`.
 ```
 
-**Tip:** For reference files >100 lines, include a table of contents at the top so Claude can see available sections even when previewing with partial reads.
+For reference files over ~100 lines, include a table of contents at the top so the agent can see available sections even when previewing with partial reads.
 
-### SKILL.md Template
+## When to split
 
-```markdown
----
-name: skill-name
-description: >
-  Brief description of capability. Use when [specific triggers].
-  Include keywords users might say.
----
+**Granularity** is how finely you divide skills, and each cut spends one of the two loads, so split only when the cut earns it. Two cuts:
 
-# Skill Name
+- **By invocation** — split off a **model-invoked** skill when you have a distinct **leading word** that should trigger it on its own, or another skill must reach it. You pay **context load** for the new always-loaded **description**, so that independent reach has to be worth it.
+- **By sequence** — split a run of **steps** when the steps still ahead (a step's **post-completion steps**) tempt the agent to rush the one in front of it (**premature completion**). Keeping them out of view encourages the agent to do more **legwork** on the current task.
 
-## Quick Start
+## Pruning
 
-[Minimal working example or first steps]
+Keep each meaning in a **single source of truth**: one authoritative place, so changing the behaviour is a one-place edit.
 
-## Workflow
+Check every line for **relevance**: does it still bear on what the skill does?
 
-[Step-by-step process, with decision points if needed]
+Then hunt **no-ops** sentence by sentence, not just line by line: run the no-op test on each sentence in isolation, and when one fails, delete the whole sentence rather than trim words from it. Be aggressive — most prose that fails should go, not be rewritten.
 
-## Advanced
+## Leading words
 
-[Link to reference files if content exceeds main file]
-See [references/advanced.md](references/advanced.md) for details.
-```
+A **leading word** is a compact concept already living in the model's pretraining that the agent thinks with while running the skill (e.g. _lesson_, _fog of war_, _tracer bullets_). Repeated throughout the text (though not necessarily - a strong leading word might only be needed once), it accumulates a distributed definition and anchors a whole region of behaviour in the fewest tokens, by recruiting priors the model already holds.
 
-### Description Guidelines
+It serves predictability twice. In the body it anchors _execution_: the agent reaches for the same behaviour every time the word appears. In the description it anchors _invocation_: when the same word lives in your prompts, docs, and code, the agent links that shared language to the skill and fires it more reliably.
 
-The description is the **only thing Claude sees** when deciding whether to load a skill. It must include:
-- What the skill does (first sentence)
-- When to trigger it (second sentence, "Use when...")
-- Key trigger words/contexts
+Hunt for opportunities to refactor skills to use leading words. A triad spelled out at three sites (**duplication**), a description spending a sentence to gesture at one idea — each is a passage begging to **collapse** into a single token. Examples include:
 
-**Good:** "Generate BigQuery queries for sales analytics. Use when user asks about sales data, revenue metrics, pipeline analysis, or mentions BigQuery and sales in the same request."
+- "fast, deterministic, low-overhead" -> _tight_ — one quality restated across a phase — into a single pretrained word (a _tight_ loop).
+- "a loop you believe in" -> _red_ — converts a fuzzy gate into a binary observable state (the loop goes _red_ on the bug, or it doesn't).
 
-**Bad:** "Helps with data queries."
+You win twice over: fewer tokens, _and_ a sharper hook for the agent to hang its thinking on. Assume every skill is carrying restatements that leading words retire — go find them.
 
-### Naming Conventions
+## Portability
 
-Use consistent naming with lowercase letters, numbers, and hyphens only. Prefer gerund form (verb + -ing) for clarity:
-- Good: `processing-pdfs`, `analyzing-spreadsheets`, `managing-databases`
-- Avoid: `helper`, `utils`, `tools` (too vague)
+A skill may run in any coding agent, not just the one it was authored in — never hard-code what a harness controls:
 
-### Writing Principles
+- **MCP tools:** name them by server + capability — "the Linear server's issue-creation tool" — never by exact identifier. Harnesses prefix and rename tools differently; the executing agent resolves the actual name.
+- **Always-needed command output:** when a skill always needs the same deterministic command output upfront (a git status, a schema dump), handle both runtimes in the skill: include the dynamic context injection syntax (fetch and follow https://code.claude.com/docs/en/skills#inject-dynamic-context) so Claude Code pre-renders the output at load, _and_ a plain instruction worded as a fallback — "If the output of X isn't already shown above, run X and use its output." Claude Code agents see the rendered output and skip the run; other agents see unrendered syntax, ignore it, and run the command.
+- **User-invocation mechanics:** each agent gates invocation its own way. The frontmatter switch (see Invocation above) covers Claude Code; Codex reads an `agents/openai.yaml` file in the skill folder instead. A user-invoked skill ships both:
 
-**Concise is key.** Claude is already smart - only add context it doesn't have. Challenge each piece:
-- "Does Claude really need this explanation?"
-- "Can I assume Claude knows this?"
-- "Does this paragraph justify its token cost?"
+  ```yaml
+  # agents/openai.yaml
+  policy:
+    allow_implicit_invocation: false
+  ```
 
-**Set appropriate degrees of freedom.** Match specificity to task fragility:
-- **High freedom** (text instructions): Multiple approaches valid, decisions depend on context
-- **Medium freedom** (pseudocode/parameterized scripts): Preferred pattern exists, some variation OK
-- **Low freedom** (specific scripts, exact commands): Operations are fragile, consistency critical
+## Scripts and long-running steps
 
-**Other principles:**
-- **Explain the why** - Theory of mind beats rigid MUSTs.
-- **One level of references** - SKILL.md links to files; those files don't link further.
+- If the skill's workflow contains a deterministic operation (validation, formatting, parsing) or code the agent would regenerate every run, read `references/scripts.md` — it may deserve a script.
+- If the skill has long-running steps an agent could derail from, read `references/task-lists.md`.
 
-### When to Add Scripts
+## Failure modes
 
-Add utility scripts when:
-- Operations are deterministic (validation, formatting)
-- Same code would be generated repeatedly
-- Errors need explicit handling
+Use these to diagnose issues the user may be having with the skill.
 
-**Use `/create-cli` to build utility CLIs.** When a skill needs a CLI script, use `/create-cli` to build it. This ensures the CLI is agent-friendly (non-interactive, parseable output, actionable errors).
-
-**Make clear whether Claude should execute or read the script:**
-- **Execute** (most common): "Run `analyze_form.py` to extract fields" - more reliable, saves tokens
-- **Read as reference**: "See `analyze_form.py` for the extraction algorithm" - when Claude needs to understand the logic
-
-**Don't assume packages are installed.** Be explicit about dependencies:
-- Bad: "Use the pdf library to process the file."
-- Good: "Install required package: `pip install pypdf`, then use `PdfReader` to open files."
-
-### MCP Tool References
-
-If your skill uses MCP tools, always use fully qualified names to avoid "tool not found" errors:
-
-```markdown
-Use the BigQuery:bigquery_schema tool to retrieve table schemas.
-Use the GitHub:create_issue tool to create issues.
-```
-
-Format: `ServerName:tool_name` - without the server prefix, Claude may fail to locate the tool.
-
-### Dynamic Context Injection
-
-Use dynamic context injection to run shell commands **before** the skill is sent to Claude. The output replaces the placeholder, so Claude receives actual data, not the command.
-
-**Syntax:**
-- Inline: exclamation mark followed by backtick-wrapped command (e.g., `!` + `` `git status` ``)
-- Multi-line: open a code fence with three backticks followed by `!`, then close normally
-
-**When to use:** You always need the same context upfront (not conditional).
-
-**Example - PR summary skill:**
-
-A skill that needs PR context would include lines like:
-- `- PR diff:` followed by inline command for `gh pr diff`
-- `- Changed files:` followed by inline command for `gh pr diff --name-only`
-
-**Example - multi-line environment info:**
-
-A skill needing multiple commands would use a fenced block opened with the `!` modifier, containing commands like `node --version` and `npm --version` on separate lines.
-
-This is preprocessing - Claude only sees the final output, not the commands. Don't use this for conditional logic (if A do X, if B do Y) - those should be regular instructions Claude executes.
-
-## Workflows and Feedback Loops
-
-### Use Workflows for Complex Tasks
-
-For multi-step operations, use `TaskCreate` to create one task per step. This prevents derailment after interruptions (hooks, agent results, context compaction).
-
-**Key insight:** Claude can only read task titles, not descriptions. Put essential information in the title:
-- Gate conditions: "GATE: steps 1-7 complete — Push and create PR"
-- Key context: "Run /simplify — wait for ALL agents before proceeding"
-
-**Pattern: Gated workflow**
-
-Some steps depend on prior steps. Make this explicit in the task title so it's visible after compaction.
-
-````markdown
-## FIRST: Create your task checklist
-
-Before reading anything else, use TaskCreate to create one task per step below. Mark each task completed as you finish it. After any interruption, check your task list to find the next uncompleted step.
-
-**Important**: Copy each step verbatim as the task `subject` — gate conditions must appear in the subject so they're visible in TaskList after compaction.
-
-1. Read context and reference files
-2. Create feature branch
-3. Implement core functionality
-4. Run tests and type check
-5. Run /simplify — wait for ALL agents to report back, fix issues, re-run tests
-6. GATE: steps 1-5 complete — Push branch, create PR, run code review
-7. GATE: steps 1-6 complete — Stop and wait for user review
-8. GATE: user approved — Merge PR
-````
-
-**Why this works:**
-- Tasks created upfront survive context loss
-- Gate conditions in titles prevent premature execution
-- "After any interruption, check your task list" recovers state
-
-### Implement Feedback Loops
-
-For quality-critical operations, build in validation cycles (run check → fix → repeat):
-
-```markdown
-## Editing process
-
-1. Make your edits
-2. **Validate immediately**:
-   - With scripts: `python scripts/validate.py`
-   - Without scripts: Review against checklist in STYLE_GUIDE.md
-3. If validation fails:
-   - Note specific issues
-   - Fix them
-   - Validate again
-4. **Only proceed when validation passes**
-```
-
-This pattern catches errors early whether you're using code or manual review.
-
-## Common Patterns
-
-### Template Pattern
-
-Provide templates for output format. Match strictness to requirements:
-
-````markdown
-## Report structure
-
-ALWAYS use this exact template:
-
-```markdown
-# [Title]
-
-## Executive summary
-[One-paragraph overview]
-
-## Key findings
-- Finding 1
-- Finding 2
-
-## Recommendations
-1. Action item
-2. Action item
-```
-````
-
-### Examples Pattern
-
-Show input/output pairs for skills where output quality depends on examples:
-
-````markdown
-## Commit message format
-
-**Example 1:**
-Input: Added user authentication with JWT tokens
-Output: `feat(auth): implement JWT-based authentication`
-
-**Example 2:**
-Input: Fixed bug where dates displayed incorrectly
-Output: `fix(reports): correct date formatting in timezone conversion`
-````
-
-### Conditional Workflow Pattern
-
-Guide Claude through decision points:
-
-```markdown
-## Document modification workflow
-
-1. Determine the modification type:
-
-   **Creating new content?** → Follow "Creation workflow" below
-   **Editing existing content?** → Follow "Editing workflow" below
-
-2. Creation workflow:
-   - Use library X
-   - Build from scratch
-   - Export to format
-
-3. Editing workflow:
-   - Unpack existing document
-   - Modify directly
-   - Validate after each change
-```
-
-## Review Checklist
-
-Before finalizing:
-
-- [ ] Description includes trigger phrases ("Use when...")
-- [ ] SKILL.md under 500 lines
-- [ ] No time-sensitive information
-- [ ] Consistent terminology throughout
-- [ ] Concrete examples included
-- [ ] References one level deep (if any)
-- [ ] Tested with a real task
-
-## Anti-Patterns
-
-- **Drafting before understanding** - The skill will be generic and miss important cases.
-- **Over-engineering** - Start minimal; add complexity only when needed.
-- **Vague descriptions** - "Helps with X" doesn't trigger; be specific.
-- **Deep nesting** - Claude may only partially read nested references.
-- **Time-sensitive content** - "After August 2025, use X" will rot.
-- **Offering too many options** - "Use pypdf, or pdfplumber, or PyMuPDF..." is confusing. Provide a default with an escape hatch for edge cases.
-- **Batching questions** - Hides dependencies; each answer should inform the next.
-- **Asking without a recommendation** - You're the designer, not a form.
-- **Asking what could be read** - Skim referenced files, attached transcripts, or the existing skill before asking the user.
+- **Premature completion** — ending a step before it's genuinely done, attention slipping to _being done_. Defence, in order: sharpen the completion criterion first (cheap, local); only if it is irreducibly fuzzy _and_ you observe the rush, hide the post-completion steps by splitting (the sequence cut).
+- **Duplication** — the same meaning in more than one place. Costs maintenance and tokens, and inflates a meaning's prominence on the ladder past its real rank.
+- **Sediment** — stale layers that settle because adding feels safe and removing feels risky. The default fate of any skill without a pruning discipline.
+- **Sprawl** — a skill simply too long, even when every line is live and unique. Hurts readability and maintainability and wastes tokens. The cure is the ladder: disclose **reference** behind pointers, and split by **branch** or sequence so each path carries only what it needs.
+- **No-op** — a line the model already obeys by default, so you pay load to say nothing. The test: does it change behaviour versus the default? A weak leading word (_be thorough_ when the agent is already thorough-ish) is a no-op; the fix is a stronger word (_relentless_), not a different technique.
+- **Deep nesting** — references that link to further references; the agent may only partially read them. Keep references one level deep: `SKILL.md` links to files; those files don't link further.
+- **Time-sensitive content** — "after August 2025, use X" will rot. State behaviour, not dates.

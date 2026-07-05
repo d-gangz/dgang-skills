@@ -1,9 +1,7 @@
 ---
 name: create-cli
 description: >
-  Build command-line interfaces for AI agents. Covers arguments, flags, subcommands,
-  help text, output formats, error messages, exit codes, config/env precedence,
-  and safe/dry-run behavior. Use when building a new CLI or refactoring an existing
+  Build command-line interfaces for AI agents. Use when building a new CLI or refactoring an existing
   one for agent use.
 ---
 
@@ -222,7 +220,7 @@ mycli export --json | jq '.items[]' | mycli import --stdin
 
 ## Interview (only if not already done)
 
-If requirements aren't already clear from context, ask these questions using `AskUserQuestion`:
+If requirements aren't already clear from context, ask these questions using `AskUserQuestion`/`request_user_input`:
 
 1. **Command name + purpose**: What's the CLI called and what does it do?
 2. **Input sources**: Args only, or also stdin/files? Any secrets? (remind: never via flags—use stdin or `--password-file`)

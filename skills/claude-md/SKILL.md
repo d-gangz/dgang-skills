@@ -1,170 +1,89 @@
 ---
 name: claude-md
-description: ALWAYS invoke this command when creating, editing, or improving any CLAUDE.md file
-argument-hint: [additional information to add]
+description: Create a new CLAUDE.md or make targeted edits to an existing one
+disable-model-invocation: true
 ---
 
 # Create or Improve a CLAUDE.md
 
-## FIRST: Explore the Codebase
+## Goal
 
-**Before doing ANYTHING else**, use the Task tool with these exact parameters:
-- `subagent_type`: `Explore`
-- `thoroughness`: `very thorough`
-- `prompt`: Include the WHAT/WHY/HOW questions listed below
+CLAUDE.md is the only content guaranteed to appear in every Agent conversation in a repo — and the repo may hold code, business docs, a knowledge base, or any mix. Every line it carries is paid on every task, so it must carry only rules that are universally applicable (defined below) — that test drives every decision here. Such files usually land under ~100 lines, but length itself is not a rule: a longer file is fine when every line passes the test. Treat growth past that mark only as a cue to re-check the rules against it.
 
-Do NOT proceed until exploration is complete.
+## Process
 
----
+1. **Know the repo.** If you're creating from scratch, or the edit relies on repo knowledge you haven't verified, read `references/explore.md` and do the exploration first.
+2. **Edit or create.** If a CLAUDE.md exists, make targeted edits and steer the file toward the template below — don't rewrite from scratch unless it's fundamentally broken. If none exists, write one following the template.
+3. **Disclose the rest.** Material that is only sometimes applicable goes in a disclosure target (see below), not the root CLAUDE.md.
+4. **Validate** the whole file against the checklist.
 
-## Overview
+## Universally applicable
 
-You are creating or improving a `CLAUDE.md` file for a codebase. This file is the **only content guaranteed to appear in every Claude conversation**, making it critical infrastructure for agent effectiveness.
+A rule belongs in CLAUDE.md only if it applies to **every single task** in the repo: would it apply when fixing a bug? Adding a feature? Drafting a document? Doing research? If the answer is "only sometimes", it belongs in a disclosure target or nowhere.
 
-## Key Principles (from HumanLayer research)
+**Belongs:** "Use `uv add` instead of `pip install`" (every Python task); "Run `make check` before committing" (every change); "`company/identity.md` is the canonical source for all bios — never draft from scratch" (every writing task in that repo).
 
-1. **Under 300 lines** (ideally <100). Shorter = better followed.
-2. **Only universally applicable directives**. Claude's system prompt uses ~50 of ~150-200 available instruction slots.
-3. **Progressive disclosure**: Reference separate docs, don't inline everything.
-4. **Never use as linter**: Use actual linters/formatters, not LLM instructions for code style.
-5. **No commands, skills, hooks, or automations**: These are discoverable via `/help`, `.claude/commands/`, `.claude/skills/`, `.claude/settings.json`, and `.claude/automations/`. Don't inventory them in CLAUDE.md — they change frequently and become stale.
-6. **Use `file:line` pointers** instead of code snippets (prevents outdated info).
+**Doesn't belong:** "Use React Query for data fetching" (only when adding data fetching); "lead files follow `sales/pipeline/_LEAD-TEMPLATE.md`" (only when creating leads); style rules a linter or formatter can enforce; inventories of commands, skills, hooks, or automations (discoverable via `.claude/`, and stale the week after you write them).
 
-## What "Universally Applicable" Means
-
-A rule is universally applicable if it applies to **every single task** in this codebase. Ask yourself:
-- Would this rule apply when fixing a bug? Adding a feature? Writing tests? Refactoring?
-- If the answer is "only sometimes", it does NOT belong in CLAUDE.md.
-
-**Examples of universally applicable rules:**
-- "Use `uv add` instead of `pip install`" (applies to every Python task)
-- "Run `make check` before committing" (applies to every change)
-- "All API endpoints require authentication except `/health`" (applies to every API task)
-
-**Examples of NOT universally applicable (don't include):**
-- "Use React Query for data fetching" (only applies when adding data fetching)
-- "Add migration files for schema changes" (only applies when changing schema)
-- Code style rules (use linters instead)
-- Commands, skills, hooks, and automations (discoverable via tools, not LLM guidance)
-
-## Your Process
-
-### Step 1: Explore (ALREADY DONE ABOVE)
-
-Your Explore agent should have discovered:
-
-**WHAT** (Technology & Structure):
-- Primary language(s) and frameworks
-- Project structure (especially monorepo layouts)
-- Key directories and their purposes
-- Configuration files (package.json, pyproject.toml, Cargo.toml, etc.)
-- Build/CI configuration
-
-**WHY** (Purpose & Architecture):
-- What the project does
-- How different components relate
-- Key abstractions and patterns used
-
-**HOW** (Commands & Workflows):
-- Build commands
-- Test commands (unit, integration, e2e)
-- Lint/format commands
-- Run/dev commands
-- Deployment patterns
-
-### Step 2: Check Existing Documentation
-
-Search for:
-- Existing README.md, CONTRIBUTING.md, docs/
-- Existing CLAUDE.md — if one exists, **read it carefully and propose targeted edits** rather than rewriting from scratch. Preserve what's already working.
-- Architecture decision records (ADRs)
-- Code conventions documentation
-
-### Step 3: Create Progressive Disclosure Structure
-
-If complex docs are needed, create an `agent-docs/` directory at the repo root with focused files:
-
-```
-agent-docs/
-├── architecture.md       # System design, component relationships
-├── build-and-test.md     # How to build, test, verify changes
-├── conventions.md        # Code patterns specific to this project
-├── database.md           # Schema, migrations, data patterns
-├── api-patterns.md       # API design, authentication, etc.
-└── glossary.md           # User-specific vocabulary Claude can't infer
-```
-
-Only create files that add real value. Don't create empty templates.
-
-### Step 4: Write the CLAUDE.md
-
-Structure the file as:
+## Template
 
 ```markdown
 # Project Name
 
-[One sentence describing what this project is]
+[One sentence describing what this repo is]
 
 ## Quick Reference
 
+[The handful of commands or canonical-file pointers needed on every task.]
+[Code repo, typically:]
 - **Build**: `[command]`
 - **Test**: `[command]`
 - **Lint**: `[command]`
-- **Dev server**: `[command]`
+[Docs/ops repo: pointers to canonical sources, e.g.]
+- **Identity/Bio** → `company/identity.md` (canonical — never draft from scratch)
 
 ## Non-Obvious Structure
 
-[Don't list directories — Claude can discover those via tools]
-[Instead, document things that AREN'T discoverable from file names alone:]
-[- Generated code paths (so Claude doesn't edit them)]
+[Don't list directories — agents discover those via tools.]
+[Document only what file and directory names alone don't reveal:]
+[- Generated or machine-managed paths (so agents don't edit or hand-create them)]
 [- Monorepo package relationships and dependency direction]
 [- Naming conventions that imply behavior (e.g. *.server.ts = server-only)]
-[- Co-location patterns (e.g. each feature owns its routes/, models/, services/)]
+[- Canonical vs superseded distinctions (e.g. positioning/ current, archive/ old)]
 
 ## Key Patterns
 
-[2-3 critical patterns or conventions unique to this codebase]
-[Use file:line references, not code snippets]
+[2-3 critical patterns unique to this repo, as pointers to canonical files (file:line for code) — never copied content]
 
 ## Documentation
 
 - `agent-docs/architecture.md` - System design and component relationships
-- `agent-docs/build-and-test.md` - Detailed build and test instructions
-[Only list files that exist]
+- `content/CLAUDE.md` - Content creation conventions (scoped)
+[Only list files that exist. Scoped CLAUDE.md files MUST be listed here: only Claude Code auto-loads them; other agents (e.g. Codex) read just the root file and find them only through this list.]
 
 ## Critical Rules
 
-[Only include rules that are UNIVERSALLY applicable across ALL tasks]
-[Max 5-10 rules]
-[If it can be enforced by a linter, don't include it here]
+[Only universally applicable rules; max 5-10; nothing a linter can enforce]
 ```
 
-### Step 5: Validate Against Checklist
+## Disclosure targets
 
-Before writing the CLAUDE.md:
+Two homes for "only sometimes" material — topics that matter for certain tasks but fail the universally-applicable test:
 
-- [ ] Under 100 lines (stretch goal: under 60)
-- [ ] No code style rules (use linters instead)
-- [ ] No code snippets (use file:line references)
-- [ ] Only universally applicable directives
-- [ ] Commands are verified to work
-- [ ] Progressive disclosure used for complex topics
-- [ ] References existing documentation where appropriate
+- **Scoped CLAUDE.md** in a subdirectory, when the material maps to that directory (e.g. `content/CLAUDE.md` for content conventions). Claude Code auto-loads it when working in that directory — but only Claude Code does, so every scoped file must also be listed in the root CLAUDE.md's Documentation section for other agents to find.
+- **`agent-docs/`** at the repo root, for cross-cutting topics that don't map to one directory, e.g. `architecture.md`, `conventions.md`, `glossary.md`.
 
-## Output
+Only create a file when you have real content for it — no empty templates. The root CLAUDE.md's Documentation section lists them all.
 
-1. **First**: Summarize what you discovered about the codebase
-2. **Second**: Directly create or edit the `CLAUDE.md` file. If one exists, make targeted edits. If not, create it.
-3. **Third**: Create any `agent-docs/` files that add real value
-4. **Fourth**: List unresolved questions (e.g., "Is there a staging environment?")
+## Checklist
 
-## Important Notes
+The change is done only when every box checks:
 
-- If a CLAUDE.md already exists, **default to targeted edits** — don't rewrite from scratch. Only do a full replacement if the existing file is fundamentally broken.
-- Ask clarifying questions if the codebase purpose is unclear.
-- Don't guess at commands—verify they exist in package.json/Makefile/etc.
-- Don't include commands, skills, hooks, automations, or other discoverable/deterministic config. These belong in `.claude/commands/`, `.claude/skills/`, `.claude/settings.json`, and `.claude/automations/` — not CLAUDE.md.
-
-## Additional information provided by User
-
-$ARGUMENTS
+- [ ] Every directive universally applicable
+- [ ] If past ~100 lines, the test above was re-run and every line still passes
+- [ ] No style rules a linter or formatter could enforce
+- [ ] No copied content — point at canonical files (`file:line` for code)
+- [ ] No inventories of commands, skills, hooks, or automations
+- [ ] Every command and file path verified to exist, not guessed
+- [ ] "Only sometimes" material moved to a disclosure target, not deleted or inlined
+- [ ] Scoped CLAUDE.md files all listed in the Documentation section
