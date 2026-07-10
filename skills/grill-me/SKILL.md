@@ -14,14 +14,14 @@ Interview the user relentlessly about the thing they want to work on, walking th
 
 1. **Ground first.** Spawn sub-agents in parallel to read the relevant codebase and anything the user attached or referenced — files, URLs, tickets, docs. Skip only if the subject is genuinely context-free.
 2. **Start at the root.** Open with the decision that gates the most others. Ask if the subject itself is unclear.
-3. **One question at a time, always with a recommended answer.** End on a single ask — don't bolt a second question on with "and" or a dash; that's the next turn's, not a tail on this one. An either/or that rephrases the same question is fine. Choice-shaped decisions get numbered options; open or reframing ones get just the recommendation and why. Lay it out per **Question shape**.
-4. **Explore instead of asking** when the answer lives in code, config, git history, or the attached resources. Only ask for judgment, preference, or knowledge you can't derive.
+3. **One question at a time, always with a recommended answer.** End on a single ask — don't bolt a second question on with "and" or a dash; that's the next turn's, not a tail on this one. An either/or that rephrases the same question is fine. Lay it out per **Question shape**.
+4. **Facts you find; decisions are theirs.** A fact — anything in the code, config, git history, or the attached resources — you look up/explore rather than ask. A decision is the user's: put it to them. Only ask for decisions, and for facts you genuinely can't derive.
 5. **Follow dependencies.** Resolve decisions in dependency order — each answer constrains the next, so settle the gating one before the choices that hang off it. Don't wander to siblings until the current branch is resolved.
-6. **Don't stop early.** Keep going until every decision has an answer, the user ends it, or what's left is pure implementation detail. Then summarize the decisions made.
+6. **Don't stop early.** Keep going until every decision has an answer, the user ends it, or what's left is pure implementation detail. Then summarize the decisions made — and stop. Don't act on the plan until the user confirms the summary reflects shared understanding.
 
 ## Question shape
 
-Make it answerable at a glance: lead with the question, then the options — each option's detail rides in the option, not a preamble before the list.
+Make it answerable at a glance: lead with the question, then the options — each option's detail rides in the option, not a preamble before the list. Choice-shaped decisions get numbered options; open or reframing ones get just the recommendation and why.
 
 **Q1 — the question, one line.**
 
