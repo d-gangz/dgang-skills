@@ -1,12 +1,10 @@
 ---
-name: grill-me
+name: grilling
 description: >
   Interview the user relentlessly about a plan, design, or idea until reaching
   shared understanding. Use when they want to stress-test a plan, get grilled
-  on a design, or say "grill me".
+  on a design.
 ---
-
-# Grill Me
 
 Interview the user relentlessly about the thing they want to work on, walking the decision tree one branch at a time. The steps below are the mechanics; the goal is shared understanding — you and the user aligned on what to do and why. Keep the interview sharp and adaptive: pull moves as the conversation needs them, don't march the list.
 
