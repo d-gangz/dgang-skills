@@ -8,7 +8,7 @@ Spawn a read-only exploration subagent, ask it to be very thorough, and give it 
 
 **HOW** (Workflows): the recurring tasks and what runs them. Code: build, test (unit/integration/e2e), lint/format, run/dev, deployment. Docs/ops: the automations and tools that generate or consume content (so machine-managed paths are known), and the workflows the repo supports.
 
-Also check existing documentation: README.md, CONTRIBUTING.md, docs/, scoped CLAUDE.md files in subdirectories, architecture decision records, convention docs. Done when you can answer all three question groups and know what documentation already exists.
+Also check existing documentation: README.md, CONTRIBUTING.md, `CONTEXT.md`, `CONTEXT-MAP.md`, `agent-docs/`, architecture decision records, and convention docs. Locate domain contexts by meaning, not code structure: code and non-code repos may organize them anywhere. Done when you can answer all three question groups and know what documentation already exists.
 
 For a targeted edit, scope the exploration to what the edit touches — you don't need the full sweep to verify one command or one pointer.
 
